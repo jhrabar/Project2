@@ -3,10 +3,10 @@ from sqlite3 import Error
 
 dbname = 'gedcom.db'
 
-createindi = '''CREATE TABLE individual
+createindi = '''CREATE TABLE IF NOT EXISTS individual
 (ID text PRIMARY KEY, name text, gender text, birthday text, age int, alive int, death text, child text, spouse text)'''
 
-createfam = '''CREATE TABLE family
+createfam = '''CREATE TABLE IF NOT EXISTS family
 (ID text PRIMARY KEY, married text, divorced text, hID text, hname text, wID text, wname text, children text)'''
 
 indiKeys = ['ID', 'name', 'gender', 'birthday', 'age', 'alive', 'death', 'child', 'spouse']
@@ -89,5 +89,13 @@ def addfams(families):
 
 	fams = translate_fams(families)
 	curs.executemany(famentry, fams)
+	conn.commit()
+	conn.close()
+
+def update_spousenames():
+	conn = create_connection(dbname)
+	curs = conn.cursor()
+	curs.execute('''UPDATE family SET hname = (SELECT name FROM individual WHERE ID = hID)''')
+	curs.execute('''UPDATE family SET wname = (SELECT name FROM individual WHERE ID = wID)''')
 	conn.commit()
 	conn.close()

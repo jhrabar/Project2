@@ -9,6 +9,7 @@ from dbcommands import translate_fams
 from dbcommands import addfams
 from dbcommands import addindis
 from dbcommands import create_tables
+from dbcommands import update_spousenames
 
 fileName = input("Input name of GEDCOM file:\n")
 file = open(fileName)
@@ -188,9 +189,10 @@ for gedLine in file:
 individs = translate_indis(Individuals)
 famils = translate_fams(Families)
 
-#create_tables()
+create_tables()
 
 addfams(Families)
 addindis(Individuals)
+update_spousenames()
 print(individs)
 print(famils)
