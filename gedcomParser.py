@@ -2,6 +2,14 @@
 #SSW555
 #I Pledge My Honor That I Have Abided By The Stevens Honor System
 
+import sqlite3
+from sqlite3 import Error
+from dbcommands import translate_indis
+from dbcommands import translate_fams
+from dbcommands import addfams
+from dbcommands import addindis
+from dbcommands import create_tables
+
 fileName = input("Input name of GEDCOM file:\n")
 file = open(fileName)
 
@@ -123,7 +131,7 @@ for gedLine in file:
 							data = data.replace(char,'')
 						Individuals[-1]["spouse"].append(data)
 
-				
+
 
 				elif(fam == True and indi == False):
 					if(tag == "MARR"):
@@ -153,7 +161,7 @@ for gedLine in file:
 						for char in '@':
 							data = data.replace(char,'')
 						Families[-1]["children"].append(data)
-			
+
 
 		#If the tag is indi or fam, this will create a new family or individual dictionary to add data too from the next lines in the file
 		else:
@@ -176,3 +184,13 @@ for gedLine in file:
 				famTag = data
 				Families.append(famDict())
 				Families[-1]["ID"] = famTag
+
+individs = translate_indis(Individuals)
+famils = translate_fams(Families)
+
+#create_tables()
+
+addfams(Families)
+addindis(Individuals)
+print(individs)
+print(famils)
