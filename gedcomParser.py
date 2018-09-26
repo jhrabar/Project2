@@ -9,8 +9,8 @@ zeroTags = ["INDI", "FAM", "HEAD", "TRLR", "NOTE"]
 oneTags = ["NAME","SEX","BIRT","DEAT","FAMC","FAMS","MARR","HUSB","WIFE","CHIL","DIV"]
 twoTags = ["DATE"]
 
-dict Individuals = {}
-dict Families = {}
+Individuals = []
+Families = []
 
 #specifies whether an individual's data or a family's data is being parsed
 indi = False
@@ -91,11 +91,64 @@ for gedLine in file:
 			data = " ".join(lineAsArray[2:])
 			if(validity == "Y"):
 				if(indi == True and fam == False):
-					if(tag == "")
+					if(tag == "NAME"):
+						Individuals[-1]["name"] = data
+					elif(tag == "SEX"):
+						Individuals[-1]["gender"] = data
+					elif(tag == "BIRT"):
+						birth = True
+						death = False
+						marriage = False
+						divorce = False
+					elif(tag == "DEAT"):
+						birth = False
+						death = True
+						marriage = False
+						divorce = False
+					elif(tag == "DATE"):
+						if(birth == True):
+							Individuals[-1]["birthday"] = data
+						elif(death == True):
+							Individuals[-1]["death"] = data
+					elif(tag == "FAMC"):
+						for char in '@':
+							data = data.replace(char,'')
+						Individuals[-1]["child"].append(data)
+					elif(tag == "FAMS"):
+						for char in '@':
+							data = data.replace(char,'')
+						Individuals[-1]["spouse"].append(data)
+
 				
 
 				elif(fam == True and indi == False):
-					Families[famTag][tag] = data
+					if(tag == "MARR"):
+						birth = False
+						death = False
+						marriage = True
+						divorce = False
+					elif(tag == "DIV"):
+						birth = False
+						death = False
+						marriage = False
+						divorce = True
+					elif(tag == "DATE"):
+						if(marriage == True):
+							Families[-1]["married"] = data
+						elif(divorce == True):
+							Families[-1]["divorced"] = data
+					elif(tag == "HUSB"):
+						for char in '@':
+							data = data.replace(char,'')
+						Families[-1]["hID"] = data
+					elif(tag == "WIFE"):
+						for char in '@':
+							data = data.replace(char,'')
+						Families[-1]["wID"] = data
+					elif(tag == "CHIL"):
+						for char in '@':
+							data = data.replace(char,'')
+						Families[-1]["children"].append(data)
 			
 
 
@@ -104,17 +157,18 @@ for gedLine in file:
 			if(tag == "INDI"):
 				indi = True
 				fam = False
+				for char in '@':
+					data = data.replace(char,'')
 				indiTag = data
-				Individuals[indiTag] = indDict()
-				Individuals[indiTag]["ID"] = indiTag
+				Individuals.append(indDict())
+				Individuals[-1]["ID"] = indiTag
 				famTag = ""
 			else:
 				indi = False
 				fam = True
+				for char in '@':
+					data = data.replace(char,'')
 				indiTag = ""
 				famTag = data
-				Families[famTag] = famDict()
-				Families[famTag]["ID"] = famTag
-
-
-	#print("<--" + lineAsArray[0] + "|" + tag + "|" + validity + "|" + data + "\n" + "\n")
+				Families.append(famDict())
+				Families[-1]["ID"] = famTag
