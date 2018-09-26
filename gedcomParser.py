@@ -27,8 +27,7 @@ marriage = False
 divorce = False
 
 
-
-
+# Each individual and family is going to be a dictionary that will be added to a database
 indiKeys = ['ID', 'name', 'gender', 'birthday', 'age', 'alive', 'death', 'child', 'spouse']
 famKeys = ['ID', 'married', 'divorced', 'hID', 'hname', 'wID', 'wname', 'children']
 def indDict():
@@ -44,12 +43,12 @@ def famDict():
 
 
 for gedLine in file:
-	print("--> " + gedLine)
 	lineAsArray = gedLine.split()
 	data = ""
 	tag = ""
 
 
+	# Checks if the tag given is in the list of acceptable 0 level tags and assigns validity accordingly
 	if(lineAsArray[0] == "0"):
 		for Tag in lineAsArray[1:]:
 			if(Tag in zeroTags):
@@ -60,7 +59,7 @@ for gedLine in file:
 			tag = lineAsArray[1]
 
 
-
+	# Checks if the tag given is in the list of acceptable 1 level tags and assigns validity accordingly
 	elif(lineAsArray[0] == "1"):
 		for Tag in lineAsArray[1:]:
 			if(Tag in oneTags):
@@ -72,7 +71,7 @@ for gedLine in file:
 
 
 
-
+	# Checks if the tag given is in the list of acceptable 2 level tags and assigns validity accordingly
 	elif(lineAsArray[0] == "2"):
 		for Tag in lineAsArray[1:]:
 			if(Tag in twoTags):
@@ -84,13 +83,17 @@ for gedLine in file:
 
 
 
-
-
+	#if there is data this part determines what it is
 	if (len(lineAsArray) > 1):
+
+		#checks if the tag is something other than indi or fam
 		if(tag != "INDI" and tag != "FAM"):
 			data = " ".join(lineAsArray[2:])
+
+			#if it is a valid tag that isn't indi or fam, the data will get added to the proper family or individual dictionary
 			if(validity == "Y"):
 				if(indi == True and fam == False):
+
 					if(tag == "NAME"):
 						Individuals[-1]["name"] = data
 					elif(tag == "SEX"):
@@ -108,6 +111,7 @@ for gedLine in file:
 					elif(tag == "DATE"):
 						if(birth == True):
 							Individuals[-1]["birthday"] = data
+							Individuals[-1]["age"] = 2018 - int(data[len(data) - 4:])
 						elif(death == True):
 							Individuals[-1]["death"] = data
 					elif(tag == "FAMC"):
@@ -151,7 +155,7 @@ for gedLine in file:
 						Families[-1]["children"].append(data)
 			
 
-
+		#If the tag is indi or fam, this will create a new family or individual dictionary to add data too from the next lines in the file
 		else:
 			data = lineAsArray[1]
 			if(tag == "INDI"):
