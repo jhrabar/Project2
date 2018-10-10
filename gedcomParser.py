@@ -2,6 +2,7 @@
 #SSW555
 #I Pledge My Honor That I Have Abided By The Stevens Honor System
 
+import datetime
 import sqlite3
 from sqlite3 import Error
 from dbcommands import *
@@ -41,6 +42,23 @@ divorce = False
 # Each individual and family is going to be a dictionary that will be added to a database
 indiKeys = ['ID', 'name', 'gender', 'birthday', 'age', 'alive', 'death', 'child', 'spouse']
 famKeys = ['ID', 'married', 'divorced', 'hID', 'hname', 'wID', 'wname', 'children']
+
+months = {
+	"JAN": 1,
+	"FEB": 2,
+	"MAR": 3,
+	"APR": 4,
+	"MAY": 5,
+	"JUN": 6,
+	"JUL": 7,
+	"AUG": 8,
+	"SEP": 9,
+	"OCT": 10,
+	"NOV": 11,
+	"DEC": 12
+}
+
+
 def indDict():
 	res = dict.fromkeys(indiKeys)
 	res['child'] = []
@@ -51,6 +69,16 @@ def famDict():
 	res['children'] = []
 	return res
 
+def ageGetter(birthday):
+	now = datetime.datetime.now()
+	year = now.year
+	month = now.month
+	day = now.day
+	birthdayList = birthday.split()
+	if months[birthdayList[1]] > month or (months[birthdayList[1]] == month and int(birthdayList[0]) > day):
+		return year - int(birthdayList[2]) - 1
+	else:
+		return year - int(birthdayList[2])
 
 
 for gedLine in file:
@@ -122,7 +150,7 @@ for gedLine in file:
 					elif(tag == "DATE"):
 						if(birth == True):
 							Individuals[-1]["birthday"] = data
-							Individuals[-1]["age"] = 2018 - int(data[len(data) - 4:])
+							Individuals[-1]["age"] = ageGetter(data)
 						elif(death == True):
 							Individuals[-1]["death"] = data
 					elif(tag == "FAMC"):
