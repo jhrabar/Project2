@@ -121,7 +121,7 @@ def update_spousenames():
 def dateCompare(date1, date2):
 	date1List = date1.split()
 	date2List = date2.split()
-	if (int(date1List[2]) > int(date2List[2])) or (int(date1List[2]) == int(date2List[2]) and months[date1List[1]] > months[date2List][1]) or (int(date1List[2]) == int(date2List[2]) and months[date1List[1]] == months[date2List][1] and int(date1List[0]) > date2List[0]):
+	if (int(date1List[2]) > int(date2List[2])) or (int(date1List[2]) == int(date2List[2]) and months[date1List[1]] > months[date2List[1]]) or (int(date1List[2]) == int(date2List[2]) and months[date1List[1]] == months[date2List[1]] and int(date1List[0]) > int(date2List[0])):
 		return 0
 	else:
 		return 1
@@ -163,6 +163,50 @@ def child_marriage_check():
 	else:
 		return "All good, no marriage with children."
 
+def marriage_before_death():
+	#Checks whether a person has died before their marriage 
+	conn = create_connection(dbname)
+	curs = conn.cursor()
+	curs.execute('''SELECT ID, death FROM individual''')
+	result = curs.fetchall()
+	curs.execute('''SELECT ID, hID, wID, married FROM family''')
+	result2 = curs.fetchall()
+	conn.close()
+	string =""
+	for tup in result:
+		if tup[1] != "NA":
+			for tup2 in result2:
+				if(tup2[3] != "NA"):
+					if tup[0] == tup2[1] or tup[0] == tup2[2]:
+						if dateCompare(tup[1], tup2[3]) == 1:
+							string+="ERROR: INDIVIDUAL: US05: {ID}: Marriage {Marriage} occurs after death: {Death} \n".format(ID = tup[0], Marriage = tup2[3], Death = tup[1])
+	if len(string) == 0:
+		string = "No marriages occur after death\n"
+	return string	
+
+
+def divorce_before_death():
+	#Checks whether a person has died before their divorcce
+	conn = create_connection(dbname)
+	curs = conn.cursor()
+	curs.execute('''SELECT ID, death FROM individual''')
+	result = curs.fetchall()
+	curs.execute('''SELECT ID, hID, wID, divorced FROM family''')
+	result2 = curs.fetchall()
+	conn.close()
+	string =""
+	for tup in result:
+		if tup[1] != "NA":
+			for tup2 in result2:
+				if(tup2[3] != "NA"):
+					if tup[0] == tup2[1] or tup[0] == tup2[2]:
+						if dateCompare(tup[1], tup2[3]) == 1:
+							string+="ERROR: INDIVIDUAL: US05: {ID}: Divorce {Divorce} occurs after death: {Death} \n".format(ID = tup[0], Divorce = tup2[3], Death = tup[1])
+	if len(string) == 0:
+		string = "No divorces occur after death\n"
+	return string		
+
+
 def future_date_check():
 	now = datetime.datetime.now()
 	currDate = str(now.day) + " " + list(months.keys())[now.month - 1] + " " + str(now.year)
@@ -177,7 +221,7 @@ def future_date_check():
 	for tup in result:
 		if tup[1] != "NA":
 			if dateCompare(tup[1], currDate) == 0:
-				string += "ERROR: INDIVIDUAL: US01: {ID}: Birthday {Birthday} occurs in future\n".format(ID = tup[0], Birthday = tup[1])
+				string += "ERROR: FAMILY: US01: {ID}: Birthday {Birthday} occurs in future\n".format(ID = tup[0], Birthday = tup[1])
 		if tup[2] != "NA":
 			if dateCompare(tup[2], currDate) == 0:
 				string += "ERROR: INDIVIDUAL: US01: {ID}: Death {Death} occurs in future\n".format(ID = tup[0], Death= tup[2])
