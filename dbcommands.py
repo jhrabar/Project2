@@ -99,3 +99,11 @@ def update_spousenames():
 	curs.execute('''UPDATE family SET wname = (SELECT name FROM individual WHERE ID = wID)''')
 	conn.commit()
 	conn.close()
+
+def list_deceased():
+	conn = create_connection(dbname)
+	curs = conn.cursor()
+	curs.execute('''SELECT ID, name FROM individual WHERE alive = 0''')
+	result = curs.fetchall()
+	print('List of deceased:')
+	print(result)

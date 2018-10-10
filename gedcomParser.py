@@ -10,6 +10,7 @@ from dbcommands import addfams
 from dbcommands import addindis
 from dbcommands import create_tables
 from dbcommands import update_spousenames
+from dbcommands import list_deceased
 
 fileName = input("Input name of GEDCOM file:\n")
 file = open(fileName)
@@ -196,3 +197,5 @@ addindis(Individuals)
 update_spousenames()
 print(individs)
 print(famils)
+list_deceased()
+
