@@ -1,5 +1,6 @@
 import sqlite3
 from sqlite3 import Error
+import datetime
 
 dbname = 'gedcom.db'
 
@@ -14,6 +15,21 @@ famKeys = ['ID', 'married', 'divorced', 'hID', 'hname', 'wID', 'wname', 'childre
 
 indientry = "INSERT INTO individual VALUES(?,?,?,?,?,?,?,?,?)"
 famentry = "INSERT INTO family VALUES(?,?,?,?,?,?,?,?)"
+
+months = {
+	"JAN": 1,
+	"FEB": 2,
+	"MAR": 3,
+	"APR": 4,
+	"MAY": 5,
+	"JUN": 6,
+	"JUL": 7,
+	"AUG": 8,
+	"SEP": 9,
+	"OCT": 10,
+	"NOV": 11,
+	"DEC": 12
+}
 
 def create_connection(db_file):
 	try:
@@ -100,6 +116,16 @@ def update_spousenames():
 	conn.commit()
 	conn.close()
 
+
+#returns 0 if date1 is after date2 and 1 otherwise
+def dateCompare(date1, date2):
+	date1List = date1.split()
+	date2List = date2.split()
+	if (int(date1List[2]) > int(date2List[2])) or (int(date1List[2]) == int(date2List[2]) and months[date1List[1]] > months[date2List][1]) or (int(date1List[2]) == int(date2List[2]) and months[date1List[1]] == months[date2List][1] and int(date1List[0]) > date2List[0]):
+		return 0
+	else:
+		return 1
+
 def list_deceased():
 	conn = create_connection(dbname)
 	curs = conn.cursor()
@@ -136,5 +162,34 @@ def child_marriage_check():
 			return "FAIL: {famid} has child marriage".format(famid = tup[0])
 	else:
 		return "All good, no marriage with children."
+
+def future_date_check():
+	now = datetime.datetime.now()
+	currDate = str(now.day) + " " + list(months.keys())[now.month - 1] + " " + str(now.year)
+	conn = create_connection(dbname)
+	curs = conn.cursor()
+	curs.execute('''SELECT ID, birthday, death FROM individual''')
+	result = curs.fetchall()
+	curs.execute('''SELECT ID, married, divorced FROM family''')
+	result2 = curs.fetchall()
+	conn.close()
+	string = ""
+	for tup in result:
+		if tup[1] != "NA":
+			if dateCompare(tup[1], currDate) == 0:
+				string += "ERROR: INDIVIDUAL: US01: {ID}: Birthday {Birthday} occurs in future\n".format(ID = tup[0], Birthday = tup[1])
+		if tup[2] != "NA":
+			if dateCompare(tup[2], currDate) == 0:
+				string += "ERROR: INDIVIDUAL: US01: {ID}: Death {Death} occurs in future\n".format(ID = tup[0], Death= tup[2])
+	for tup in result2:
+		if tup[1] != "NA":
+			if dateCompare(tup[1], currDate) == 0:
+				string += "ERROR: FAMILY: US01: {ID}: Marriage {Marriage} occurs in future\n".format(ID = tup[0], Marriage= tup[1])
+		if tup[2] != "NA":
+			if dateCompare(tup[2], currDate) == 0:
+				string += "ERROR: FAMILY: US01: {ID}: Divorce {Divorce} occurs in future\n".format(ID = tup[0], Divorce= tup[2])
+	if len(string) == 0:
+		string = "No dates occur in future\n"
+	return string
 
 
