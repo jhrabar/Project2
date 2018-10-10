@@ -132,7 +132,7 @@ def list_deceased():
 	curs.execute('''SELECT ID, name FROM individual WHERE alive = 0''')
 	result = curs.fetchall()
 	print('List of deceased:')
-	print(result)
+	return(str(result))
 	conn.close()
 
 def get_id_from_name(ind_name):
