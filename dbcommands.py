@@ -107,3 +107,34 @@ def list_deceased():
 	result = curs.fetchall()
 	print('List of deceased:')
 	print(result)
+	conn.close()
+
+def get_id_from_name(ind_name):
+	conn = create_connection(dbname)
+	curs = conn.cursor()
+	curs.execute('''SELECT ID, name FROM individual where name = ?''', (ind_name,))
+	result = curs.fetchall()
+	conn.close()
+	return result[0][0]
+
+def get_individual_families(ind_id):
+	conn = create_connection(dbname)
+	curs = conn.cursor()
+	curs.execute('''SELECT spouse FROM individual WHERE ID = ? ''', (ind_id,))
+	result = curs.fetchall()
+	conn.close()
+	return result[0][0]
+
+def child_marriage_check():
+	conn = create_connection(dbname)
+	curs = conn.cursor()
+	curs.execute('''SELECT hId, wID, children FROM family''')
+	result = curs.fetchall()
+	conn.close()
+	for tup in result:
+		if tup[0] in tup[2] or tup[1] in tup[2]:
+			return "FAIL: {famid} has child marriage".format(famid = tup[0])
+	else:
+		return "All good, no marriage with children."
+
+
