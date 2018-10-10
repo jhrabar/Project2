@@ -4,13 +4,14 @@
 
 import sqlite3
 from sqlite3 import Error
-from dbcommands import translate_indis
-from dbcommands import translate_fams
-from dbcommands import addfams
-from dbcommands import addindis
-from dbcommands import create_tables
-from dbcommands import update_spousenames
-from dbcommands import list_deceased
+from dbcommands import *
+# from dbcommands import translate_indis
+# from dbcommands import translate_fams
+# from dbcommands import addfams
+# from dbcommands import addindis
+# from dbcommands import create_tables
+# from dbcommands import update_spousenames
+# from dbcommands import list_deceased
 
 fileName = input("Input name of GEDCOM file:\n")
 file = open(fileName)
@@ -198,4 +199,6 @@ update_spousenames()
 print(individs)
 print(famils)
 list_deceased()
-
+print(get_id_from_name('Woodrow /McPherson/'))
+print(get_individual_families('I1'))
+print(child_marriage_check())
