@@ -12,5 +12,14 @@ class Test(unittest.TestCase):
         passer = "All good, no marriage with children."
         self.assertEqual(passer, child_marriage_check())
 
+    def test_future_date_check(self):
+    	self.assertEqual("No dates occur in future\n", future_date_check())
+
+    def test_marriage_before_death(self):
+    	self.assertEqual("No marriages occur after death\n", marriage_before_death())
+
+    def test_divorce_before_death(self):
+    	self.assertEqual("No divorces occur after death\n", divorce_before_death())
+
 if __name__ == "__main__":
     unittest.main()
