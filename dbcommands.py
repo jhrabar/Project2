@@ -131,7 +131,6 @@ def list_deceased():
 	curs = conn.cursor()
 	curs.execute('''SELECT ID, name FROM individual WHERE alive = 0''')
 	result = curs.fetchall()
-	print('List of deceased:')
 	return(str(result))
 	conn.close()
 
@@ -157,11 +156,13 @@ def child_marriage_check():
 	curs.execute('''SELECT hId, wID, children FROM family''')
 	result = curs.fetchall()
 	conn.close()
+	string = ""
 	for tup in result:
 		if tup[0] in tup[2] or tup[1] in tup[2]:
-			return "FAIL: {famid} has child marriage".format(famid = tup[0])
-	else:
-		return "All good, no marriage with children."
+			string += "ERROR: FAMILY: US17: Family {famid} has a marriage to a descendant\n".format(famid = tup[0])
+	if len(string) == 0:
+		string = "US17: No marriages to descendants.\n"
+	return string
 
 def marriage_before_death():
 	#Checks whether a person has died before their marriage 
@@ -179,9 +180,9 @@ def marriage_before_death():
 				if(tup2[3] != "NA"):
 					if tup[0] == tup2[1] or tup[0] == tup2[2]:
 						if dateCompare(tup[1], tup2[3]) == 1:
-							string+="ERROR: INDIVIDUAL: US05: {ID}: Marriage {Marriage} occurs after death: {Death} \n".format(ID = tup[0], Marriage = tup2[3], Death = tup[1])
+							string+="ERROR: INDIVIDUAL: US05: {ID}: Marriage {Marriage} occurs after death: {Death}\n".format(ID = tup[0], Marriage = tup2[3], Death = tup[1])
 	if len(string) == 0:
-		string = "No marriages occur after death\n"
+		string = "US05: No marriages occur after death\n"
 	return string	
 
 
@@ -201,9 +202,9 @@ def divorce_before_death():
 				if(tup2[3] != "NA"):
 					if tup[0] == tup2[1] or tup[0] == tup2[2]:
 						if dateCompare(tup[1], tup2[3]) == 1:
-							string+="ERROR: INDIVIDUAL: US05: {ID}: Divorce {Divorce} occurs after death: {Death} \n".format(ID = tup[0], Divorce = tup2[3], Death = tup[1])
+							string+="ERROR: INDIVIDUAL: US06: {ID}: Divorce {Divorce} occurs after death: {Death}\n".format(ID = tup[0], Divorce = tup2[3], Death = tup[1])
 	if len(string) == 0:
-		string = "No divorces occur after death\n"
+		string = "US06: No divorces occur after death\n"
 	return string		
 
 
@@ -221,7 +222,7 @@ def future_date_check():
 	for tup in result:
 		if tup[1] != "NA":
 			if dateCompare(tup[1], currDate) == 0:
-				string += "ERROR: FAMILY: US01: {ID}: Birthday {Birthday} occurs in future\n".format(ID = tup[0], Birthday = tup[1])
+				string += "ERROR: INDIVIDUAL: US01: {ID}: Birthday {Birthday} occurs in future\n".format(ID = tup[0], Birthday = tup[1])
 		if tup[2] != "NA":
 			if dateCompare(tup[2], currDate) == 0:
 				string += "ERROR: INDIVIDUAL: US01: {ID}: Death {Death} occurs in future\n".format(ID = tup[0], Death= tup[2])
@@ -233,7 +234,7 @@ def future_date_check():
 			if dateCompare(tup[2], currDate) == 0:
 				string += "ERROR: FAMILY: US01: {ID}: Divorce {Divorce} occurs in future\n".format(ID = tup[0], Divorce= tup[2])
 	if len(string) == 0:
-		string = "No dates occur in future\n"
+		string = "US01: No dates occur in future\n"
 	return string
 
 
