@@ -13,8 +13,8 @@ createfam = '''CREATE TABLE IF NOT EXISTS family
 indiKeys = ['ID', 'name', 'gender', 'birthday', 'age', 'alive', 'death', 'child', 'spouse']
 famKeys = ['ID', 'married', 'divorced', 'hID', 'hname', 'wID', 'wname', 'children']
 
-indientry = "INSERT INTO individual VALUES(?,?,?,?,?,?,?,?,?)"
-famentry = "INSERT INTO family VALUES(?,?,?,?,?,?,?,?)"
+indientry = "INSERT OR REPLACE INTO individual VALUES(?,?,?,?,?,?,?,?,?)"
+famentry = "INSERT OR REPLACE INTO family VALUES(?,?,?,?,?,?,?,?)"
 
 months = {
 	"JAN": 1,
