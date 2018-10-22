@@ -5,7 +5,7 @@ import datetime
 dbname = 'gedcom.db'
 
 createindi = '''CREATE TABLE IF NOT EXISTS individual
-(ID text PRIMARY KEY, name text, gender text, birthday text, age int, alive int, death text, child text, spouse text)'''
+(ID text PRIMARY KEY, name text, gender text UNIQUE, birthday text, age int, alive int, death text, child text, spouse text)'''
 
 createfam = '''CREATE TABLE IF NOT EXISTS family
 (ID text PRIMARY KEY, married text, divorced text, hID text, hname text, wID text, wname text, children text)'''
@@ -90,11 +90,57 @@ def translate_fams(families):
 	#nfams = [tuple(l) for l in fams]
 	return fams
 
+def extract_individuals(individuals = []):
+	#returns the ids and names of all individuals in the database in two arrays
+	ids = []
+	names = []
+	conn = create_connection(dbname)
+	curs = conn.cursor()
+	if individuals == []:
+		individuals = curs.execute('''SELECT * FROM individual''').fetchall()
+	for individual in individuals:
+		ids.append(individual[0])
+		names.append(individual[1])
+	conn.close()
+	return ids, names
+
+def extract_families(families = []):
+	#returns the ids of all families in the database in an array
+	ids = []
+	conn = create_connection(dbname)
+	curs = conn.cursor()
+	if families ==[]:
+		families = curs.execute('''SELECT * FROM family''').fetchall()
+	for family in families:
+		ids.append(family[0])
+	conn.close()
+	return ids
+
+def find_duplicate_indices(arr):
+	indices = set()
+	for ind in range(len(arr)):
+		current = arr[ind]
+		if ind not in indices:
+			for secind in range(len(arr)):
+				if arr[secind] == current and secind!=ind:
+					indices.add(current)
+		else:
+			continue
+	return indices
+
 def addindis(individuals):
+	# existing_ids, existing_names = extract_individuals
+
 	conn = create_connection(dbname)
 	curs = conn.cursor()
 
 	indis = translate_indis(individuals)
+	input_ids, input_names = extract_individuals(indis)
+	dupids = set()
+	dupname= set()
+	dupids = find_duplicate_indices(input_ids)
+	dupnames = find_duplicate_indices(input_names)
+
 	curs.executemany(indientry, indis)
 	conn.commit()
 	conn.close()
