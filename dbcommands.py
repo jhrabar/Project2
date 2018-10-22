@@ -304,3 +304,19 @@ def gender_roles():
 	if len(resultString) == 0:
 		resultString = "US21: All Husbands and Wives Have Correct Gender\n"
 	return resultString
+
+def fifteen_siblings():
+	conn = create_connection(dbname)
+	curs = conn.cursor()
+	curs.execute('''SELECT ID, children FROM family''')
+	familyResult = curs.fetchall()
+	conn.close()
+	resultString = ""
+	for tup in familyResult:
+		if tup[1] != "None":
+			childrenList = tup[1].split(",")
+			if len(childrenList) >= 15:
+				resultString += "ERROR: FAMILY: US15: {fID}: Family has 15 or more children\n".format(fID = tup[0])
+	if len(resultString) == 0:
+		resultString = "US15: All Families Have Fewer than 15 Children\n"
+	return resultString
