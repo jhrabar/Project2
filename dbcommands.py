@@ -284,3 +284,23 @@ def future_date_check():
 	return string
 
 
+def gender_roles():
+	conn = create_connection(dbname)
+	curs = conn.cursor()
+	curs.execute('''SELECT ID, gender FROM individual''')
+	individualResult = curs.fetchall()
+	curs.execute('''SELECT ID, hID, wID FROM family''')
+	familyResult = curs.fetchall()
+	conn.close()
+	resultString = ""
+	for tup in individualResult:
+		for tup2 in familyResult:
+			if tup[0] == tup2[1]:
+				if tup[1] != "M":
+					resultString += "ERROR: FAMILY: US21: {fID}: Husband {hID} has incorrect gender\n".format(fID = tup2[0], hID = tup[0])
+			elif tup[0] == tup2[2]:
+				if tup[1] != "F":
+					resultString += "ERROR: FAMILY: US21: {fID}: Wife {wID} has incorrect gender\n".format(fID = tup2[0], wID = tup[0])
+	if len(resultString) == 0:
+		resultString = "US21: All Husbands and Wives Have Correct Gender\n"
+	return resultString
