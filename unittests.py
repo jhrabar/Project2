@@ -9,7 +9,7 @@ class Test(unittest.TestCase):
         self.assertEqual(passer, list_deceased())
     
     def test_child_marriage_check(self):
-        passer = "US17: No marriages to descendants.\n"
+        passer = "ERROR: FAMILY: US17: Family F1 has a marriage to a descendant\n"
         self.assertEqual(passer, child_marriage_check())
 
     def test_future_date_check(self):

@@ -1,11 +1,12 @@
 import sqlite3
 from sqlite3 import Error
 import datetime
+import re
 
 dbname = 'gedcom.db'
 
 createindi = '''CREATE TABLE IF NOT EXISTS individual
-(ID text PRIMARY KEY, name text, gender text UNIQUE, birthday text, age int, alive int, death text, child text, spouse text)'''
+(ID text PRIMARY KEY, name text UNIQUE, gender text, birthday text, age int, alive int, death text, child text, spouse text)'''
 
 createfam = '''CREATE TABLE IF NOT EXISTS family
 (ID text PRIMARY KEY, married text, divorced text, hID text, hname text, wID text, wname text, children text)'''
@@ -199,13 +200,16 @@ def get_individual_families(ind_id):
 def child_marriage_check():
 	conn = create_connection(dbname)
 	curs = conn.cursor()
-	curs.execute('''SELECT hId, wID, children FROM family''')
+	curs.execute('''SELECT ID, hId, wID, children FROM family''')
 	result = curs.fetchall()
 	conn.close()
 	string = ""
 	for tup in result:
-		if tup[0] in tup[2] or tup[1] in tup[2]:
-			string += "ERROR: FAMILY: US17: Family {famid} has a marriage to a descendant\n".format(famid = tup[0])
+		if tup[3] != "None":
+			children = ''.join(c for c in tup[3] if c not in "\"'[] ")
+			childrenList = children.split(',')
+			if tup[1] in childrenList or tup[2] in childrenList:
+				string += "ERROR: FAMILY: US17: Family {famid} has a marriage to a descendant\n".format(famid = tup[0])
 	if len(string) == 0:
 		string = "US17: No marriages to descendants.\n"
 	return string
