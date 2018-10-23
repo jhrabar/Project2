@@ -216,6 +216,7 @@ for gedLine in file:
 				Families.append(famDict())
 				Families[-1]["ID"] = famTag
 
+
 individs = translate_indis(Individuals)
 famils = translate_fams(Families)
 

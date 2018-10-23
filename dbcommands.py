@@ -5,7 +5,7 @@ import datetime
 dbname = 'gedcom.db'
 
 createindi = '''CREATE TABLE IF NOT EXISTS individual
-(ID text PRIMARY KEY, name text, gender text UNIQUE, birthday text, age int, alive int, death text, child text, spouse text)'''
+(ID text PRIMARY KEY, name text UNIQUE, gender text, birthday text, age int, alive int, death text, child text, spouse text)'''
 
 createfam = '''CREATE TABLE IF NOT EXISTS family
 (ID text PRIMARY KEY, married text, divorced text, hID text, hname text, wID text, wname text, children text)'''
@@ -135,11 +135,11 @@ def addindis(individuals):
 	curs = conn.cursor()
 
 	indis = translate_indis(individuals)
-	input_ids, input_names = extract_individuals(indis)
-	dupids = set()
-	dupname= set()
-	dupids = find_duplicate_indices(input_ids)
-	dupnames = find_duplicate_indices(input_names)
+	# input_ids, input_names = extract_individuals(indis)
+	# dupids = set()
+	# dupname= set()
+	# dupids = find_duplicate_indices(input_ids)
+	# dupnames = find_duplicate_indices(input_names)
 
 	curs.executemany(indientry, indis)
 	conn.commit()
