@@ -1,6 +1,7 @@
 import sqlite3
 from sqlite3 import Error
 import datetime
+import re
 
 dbname = 'gedcom.db'
 
@@ -135,11 +136,11 @@ def addindis(individuals):
 	curs = conn.cursor()
 
 	indis = translate_indis(individuals)
-	# input_ids, input_names = extract_individuals(indis)
-	# dupids = set()
-	# dupname= set()
-	# dupids = find_duplicate_indices(input_ids)
-	# dupnames = find_duplicate_indices(input_names)
+	input_ids, input_names = extract_individuals(indis)
+	dupids = set()
+	dupname= set()
+	dupids = find_duplicate_indices(input_ids)
+	dupnames = find_duplicate_indices(input_names)
 
 	curs.executemany(indientry, indis)
 	conn.commit()
@@ -199,13 +200,16 @@ def get_individual_families(ind_id):
 def child_marriage_check():
 	conn = create_connection(dbname)
 	curs = conn.cursor()
-	curs.execute('''SELECT hId, wID, children FROM family''')
+	curs.execute('''SELECT ID, hId, wID, children FROM family''')
 	result = curs.fetchall()
 	conn.close()
 	string = ""
 	for tup in result:
-		if tup[0] in tup[2] or tup[1] in tup[2]:
-			string += "ERROR: FAMILY: US17: Family {famid} has a marriage to a descendant\n".format(famid = tup[0])
+		if tup[3] != "None":
+			children = ''.join(c for c in tup[3] if c not in "\"'[] ")
+			childrenList = children.split(',')
+			if tup[1] in childrenList or tup[2] in childrenList:
+				string += "ERROR: FAMILY: US17: Family {famid} has a marriage to a descendant\n".format(famid = tup[0])
 	if len(string) == 0:
 		string = "US17: No marriages to descendants.\n"
 	return string
@@ -284,3 +288,39 @@ def future_date_check():
 	return string
 
 
+def gender_roles():
+	conn = create_connection(dbname)
+	curs = conn.cursor()
+	curs.execute('''SELECT ID, gender FROM individual''')
+	individualResult = curs.fetchall()
+	curs.execute('''SELECT ID, hID, wID FROM family''')
+	familyResult = curs.fetchall()
+	conn.close()
+	resultString = ""
+	for tup in individualResult:
+		for tup2 in familyResult:
+			if tup[0] == tup2[1]:
+				if tup[1] != "M":
+					resultString += "ERROR: FAMILY: US21: {fID}: Husband {hID} has incorrect gender\n".format(fID = tup2[0], hID = tup[0])
+			elif tup[0] == tup2[2]:
+				if tup[1] != "F":
+					resultString += "ERROR: FAMILY: US21: {fID}: Wife {wID} has incorrect gender\n".format(fID = tup2[0], wID = tup[0])
+	if len(resultString) == 0:
+		resultString = "US21: All Husbands and Wives Have Correct Gender\n"
+	return resultString
+
+def fifteen_siblings():
+	conn = create_connection(dbname)
+	curs = conn.cursor()
+	curs.execute('''SELECT ID, children FROM family''')
+	familyResult = curs.fetchall()
+	conn.close()
+	resultString = ""
+	for tup in familyResult:
+		if tup[1] != "None":
+			childrenList = tup[1].split(",")
+			if len(childrenList) >= 15:
+				resultString += "ERROR: FAMILY: US15: {fID}: Family has 15 or more children\n".format(fID = tup[0])
+	if len(resultString) == 0:
+		resultString = "US15: All Families Have Fewer than 15 Children\n"
+	return resultString

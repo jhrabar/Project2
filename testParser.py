@@ -15,9 +15,6 @@ from dbcommands import *
 # from dbcommands import list_deceased
 
 
-fileName = input("Input name of GEDCOM file:\n")
-file = open(fileName)
-
 zeroTags = ["INDI", "FAM", "HEAD", "TRLR", "NOTE"]
 oneTags = ["NAME","SEX","BIRT","DEAT","FAMC","FAMS","MARR","HUSB","WIFE","CHIL","DIV"]
 twoTags = ["DATE"]
@@ -25,9 +22,6 @@ twoTags = ["DATE"]
 Individuals = []
 Families = []
 
-#specifies whether an individual's data or a family's data is being parsed
-indi = False
-fam = False
 
 #keeps track of the family or individual that's being updated
 indiTag = ""
@@ -82,148 +76,147 @@ def ageGetter(birthday):
 		return year - int(birthdayList[2])
 
 def main():
-    fileName = input("Input name of GEDCOM file:\n")
-    file = open(fileName)
-    for gedLine in file:
-	lineAsArray = gedLine.split()
-	data = ""
-	tag = ""
+	fileName = input("Input name of GEDCOM file:\n")
+	file = open(fileName)
+	indi = False
+	fam = False
+	for gedLine in file:
+		lineAsArray = gedLine.split()
+		data = ""
+		tag = ""
 
-	# Checks if the tag given is in the list of acceptable 0 level tags and assigns validity accordingly
-	if(lineAsArray[0] == "0"):
-		for Tag in lineAsArray[1:]:
-			if(Tag in zeroTags):
-				tag = Tag
-				validity = "Y"
-		if(tag == ""):
-			validity = "N"
-			tag = lineAsArray[1]
+		# Checks if the tag given is in the list of acceptable 0 level tags and assigns validity accordingly
+		if(lineAsArray[0] == "0"):
+			for Tag in lineAsArray[1:]:
+				if(Tag in zeroTags):
+					tag = Tag
+					validity = "Y"
+			if(tag == ""):
+				validity = "N"
+				tag = lineAsArray[1]
 
-	# Checks if the tag given is in the list of acceptable 1 level tags and assigns validity accordingly
-	elif(lineAsArray[0] == "1"):
-		for Tag in lineAsArray[1:]:
-			if(Tag in oneTags):
-				tag = Tag
-				validity = "Y"
-		if(tag == ""):
-			validity = "N"
-			tag = lineAsArray[1]
+		# Checks if the tag given is in the list of acceptable 1 level tags and assigns validity accordingly
+		elif(lineAsArray[0] == "1"):
+			for Tag in lineAsArray[1:]:
+				if(Tag in oneTags):
+					tag = Tag
+					validity = "Y"
+			if(tag == ""):
+				validity = "N"
+				tag = lineAsArray[1]
 
-	# Checks if the tag given is in the list of acceptable 2 level tags and assigns validity accordingly
-	elif(lineAsArray[0] == "2"):
-		for Tag in lineAsArray[1:]:
-			if(Tag in twoTags):
-				tag = Tag
-				validity = "Y"
-		if(tag == ""):
-			validity = "N"
-			tag = lineAsArray[1]
+		# Checks if the tag given is in the list of acceptable 2 level tags and assigns validity accordingly
+		elif(lineAsArray[0] == "2"):
+			for Tag in lineAsArray[1:]:
+				if(Tag in twoTags):
+					tag = Tag
+					validity = "Y"
+			if(tag == ""):
+				validity = "N"
+				tag = lineAsArray[1]
 
-	#if there is data this part determines what it is
-	if (len(lineAsArray) > 1):
-		#checks if the tag is something other than indi or fam
-		if(tag != "INDI" and tag != "FAM"):
-			data = " ".join(lineAsArray[2:])
+		#if there is data this part determines what it is
+		if (len(lineAsArray) > 1):
+			#checks if the tag is something other than indi or fam
+			if(tag != "INDI" and tag != "FAM"):
+				data = " ".join(lineAsArray[2:])
 
-			#if it is a valid tag that isn't indi or fam, the data will get added to the proper family or individual dictionary
-			if(validity == "Y"):
-				if(indi == True and fam == False):
+				#if it is a valid tag that isn't indi or fam, the data will get added to the proper family or individual dictionary
+				if(validity == "Y"):
+					if(indi == True and fam == False):
 
-					if(tag == "NAME"):
-						Individuals[-1]["name"] = data
-					elif(tag == "SEX"):
-						Individuals[-1]["gender"] = data
-					elif(tag == "BIRT"):
-						birth = True
-						death = False
-						marriage = False
-						divorce = False
-					elif(tag == "DEAT"):
-						birth = False
-						death = True
-						marriage = False
-						divorce = False
-					elif(tag == "DATE"):
-						if(birth == True):
-							Individuals[-1]["birthday"] = data
-							Individuals[-1]["age"] = ageGetter(data)
-						elif(death == True):
-							Individuals[-1]["death"] = data
-					elif(tag == "FAMC"):
-						for char in '@':
-							data = data.replace(char,'')
-						Individuals[-1]["child"].append(data)
-					elif(tag == "FAMS"):
-						for char in '@':
-							data = data.replace(char,'')
-						Individuals[-1]["spouse"].append(data)
+						if(tag == "NAME"):
+							Individuals[-1]["name"] = data
+						elif(tag == "SEX"):
+							Individuals[-1]["gender"] = data
+						elif(tag == "BIRT"):
+							birth = True
+							death = False
+							marriage = False
+							divorce = False
+						elif(tag == "DEAT"):
+							birth = False
+							death = True
+							marriage = False
+							divorce = False
+						elif(tag == "DATE"):
+							if(birth == True):
+								Individuals[-1]["birthday"] = data
+								Individuals[-1]["age"] = ageGetter(data)
+							elif(death == True):
+								Individuals[-1]["death"] = data
+						elif(tag == "FAMC"):
+							for char in '@':
+								data = data.replace(char,'')
+							Individuals[-1]["child"].append(data)
+						elif(tag == "FAMS"):
+							for char in '@':
+								data = data.replace(char,'')
+							Individuals[-1]["spouse"].append(data)
 
 
 
-				elif(fam == True and indi == False):
-					if(tag == "MARR"):
-						birth = False
-						death = False
-						marriage = True
-						divorce = False
-					elif(tag == "DIV"):
-						birth = False
-						death = False
-						marriage = False
-						divorce = True
-					elif(tag == "DATE"):
-						if(marriage == True):
-							Families[-1]["married"] = data
-						elif(divorce == True):
-							Families[-1]["divorced"] = data
-					elif(tag == "HUSB"):
-						for char in '@':
-							data = data.replace(char,'')
-						Families[-1]["hID"] = data
-					elif(tag == "WIFE"):
-						for char in '@':
-							data = data.replace(char,'')
-						Families[-1]["wID"] = data
-					elif(tag == "CHIL"):
-						for char in '@':
-							data = data.replace(char,'')
-						Families[-1]["children"].append(data)
+					elif(fam == True and indi == False):
+						if(tag == "MARR"):
+							birth = False
+							death = False
+							marriage = True
+							divorce = False
+						elif(tag == "DIV"):
+							birth = False
+							death = False
+							marriage = False
+							divorce = True
+						elif(tag == "DATE"):
+							if(marriage == True):
+								Families[-1]["married"] = data
+							elif(divorce == True):
+								Families[-1]["divorced"] = data
+						elif(tag == "HUSB"):
+							for char in '@':
+								data = data.replace(char,'')
+							Families[-1]["hID"] = data
+						elif(tag == "WIFE"):
+							for char in '@':
+								data = data.replace(char,'')
+							Families[-1]["wID"] = data
+						elif(tag == "CHIL"):
+							for char in '@':
+								data = data.replace(char,'')
+							Families[-1]["children"].append(data)
 
-		#If the tag is indi or fam, this will create a new family or individual dictionary to add data too from the next lines in the file
-		else:
-			data = lineAsArray[1]
-			if(tag == "INDI"):
-				indi = True
-				fam = False
-				for char in '@':
-					data = data.replace(char,'')
-				indiTag = data
-				Individuals.append(indDict())
-				Individuals[-1]["ID"] = indiTag
-				famTag = ""
+			#If the tag is indi or fam, this will create a new family or individual dictionary to add data too from the next lines in the file
 			else:
-				indi = False
-				fam = True
-				for char in '@':
-					data = data.replace(char,'')
-				indiTag = ""
-				famTag = data
-				Families.append(famDict())
-				Families[-1]["ID"] = famTag
-    individs = translate_indis(Individuals)
-    famils = translate_fams(Families)
-    create_tables()
-    addfams(Families)
-    addindis(Individuals)
-    update_spousenames()
+				data = lineAsArray[1]
+				if(tag == "INDI"):
+					indi = True
+					fam = False
+					for char in '@':
+						data = data.replace(char,'')
+					indiTag = data
+					Individuals.append(indDict())
+					Individuals[-1]["ID"] = indiTag
+					famTag = ""
+				else:
+					indi = False
+					fam = True
+					for char in '@':
+						data = data.replace(char,'')
+					indiTag = ""
+					famTag = data
+					Families.append(famDict())
+					Families[-1]["ID"] = famTag
+	individs = translate_indis(Individuals)
+	famils = translate_fams(Families)
+	create_tables()
+	addfams(Families)
+	addindis(Individuals)
+	update_spousenames()
 
 
 if __name__ == '__main__':
     main()
-    print("Table of Individuals:")
-    print(individs)
-    print("\nTable of Families:")
-    print(famils)
+    
     print("\nList Of Deceased:")
     print(list_deceased())
     print("\n")
