@@ -21,5 +21,16 @@ class Test(unittest.TestCase):
     def test_divorce_before_death(self):
     	self.assertEqual("ERROR: INDIVIDUAL: US06: I5: Divorce 9 APR 2000 occurs after death: 7 MAR 2000\n", divorce_before_death())
 
+    def test_gender_roles(self):
+        self.assertEqual("ERROR: FAMILY: US21: F1: Husband I2 has incorrect gender\n", gender_roles())
+
+    def test_fifteen_siblings(self):
+        self.assertEqual("ERROR: FAMILY: US15: F3: Family has 15 or more children\n", fifteen_siblings())
+
+    def test_date_comparison(self):
+        self.assertEqual(1, dateCompare("15 NOV 2018", "16 NOV 2018"))
+        self.assertEqual(1, dateCompare("15 NOV 2018", "15 NOV 2018"))
+        self.assertEqual(0, dateCompare("15 NOV 2018", "14 NOV 2018"))
+
 if __name__ == "__main__":
     unittest.main()
