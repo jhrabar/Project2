@@ -2,11 +2,13 @@ import sqlite3
 from sqlite3 import Error
 import datetime
 import re
+from collections import Counter
 
 dbname = 'gedcom.db'
 
 createindi = '''CREATE TABLE IF NOT EXISTS individual
-(ID text PRIMARY KEY, name text UNIQUE, gender text, birthday text, age int, alive int, death text, child text, spouse text)'''
+(ID text PRIMARY KEY, name text, gender text, birthday text, age int, alive int, death text, child text, spouse text, 
+UNIQUE(name, birthday))'''
 
 createfam = '''CREATE TABLE IF NOT EXISTS family
 (ID text PRIMARY KEY, married text, divorced text, hID text, hname text, wID text, wname text, children text)'''
@@ -91,43 +93,25 @@ def translate_fams(families):
 	#nfams = [tuple(l) for l in fams]
 	return fams
 
-def extract_individuals(individuals = []):
-	#returns the ids and names of all individuals in the database in two arrays
-	ids = []
-	names = []
-	conn = create_connection(dbname)
-	curs = conn.cursor()
-	if individuals == []:
-		individuals = curs.execute('''SELECT * FROM individual''').fetchall()
-	for individual in individuals:
-		ids.append(individual[0])
-		names.append(individual[1])
-	conn.close()
-	return ids, names
-
-def extract_families(families = []):
-	#returns the ids of all families in the database in an array
-	ids = []
-	conn = create_connection(dbname)
-	curs = conn.cursor()
-	if families ==[]:
-		families = curs.execute('''SELECT * FROM family''').fetchall()
-	for family in families:
-		ids.append(family[0])
-	conn.close()
-	return ids
-
-def find_duplicate_indices(arr):
-	indices = set()
-	for ind in range(len(arr)):
-		current = arr[ind]
-		if ind not in indices:
-			for secind in range(len(arr)):
-				if arr[secind] == current and secind!=ind:
-					indices.add(current)
+def find_duplicates(arr):
+	items = set()
+	counts = Counter(arr)
+	for item in arr:
+		if counts[item] >1:
+			items.add(item)
 		else:
 			continue
-	return indices
+	return items
+
+def find_dupe_pairs(arr):
+	items = set()
+	counts = Counter(arr)
+	for item in arr:
+		if counts[item] >1:
+			items.add(item)
+		else:
+			continue
+	return items
 
 def addindis(individuals):
 	# existing_ids, existing_names = extract_individuals
@@ -136,24 +120,38 @@ def addindis(individuals):
 	curs = conn.cursor()
 
 	indis = translate_indis(individuals)
-	input_ids, input_names = extract_individuals(indis)
-	dupids = set()
-	dupname= set()
-	dupids = find_duplicate_indices(input_ids)
-	dupnames = find_duplicate_indices(input_names)
+	idlist = [individual[0] for individual in indis]
+	name_date_list = [(individual[1],individual[3]) for individual in indis]
+	duplicated_ids = list(find_duplicates(idlist))
+	duplicated_name_dates = list(find_duplicates(name_date_list))
+	if len(duplicated_ids) ==0 and len(duplicated_name_dates) == 0:
+		dupestring = "No duplicated individual ids or (name, date) pairs."
+	else:
+		dupestring = "ERROR: You have duplicate ids or (name,date) pairs, only one individual associated with each will appear in the database\n"
+		dupestring = dupestring + str(duplicated_ids) + "\n" + str(duplicated_name_dates)
 
 	curs.executemany(indientry, indis)
 	conn.commit()
 	conn.close()
+	return dupestring
 
 def addfams(families):
 	conn = create_connection(dbname)
 	curs = conn.cursor()
 
 	fams = translate_fams(families)
+	idlist = [family[0] for family in fams]
+	duplicated_ids = list(find_duplicates(idlist))
+	if len(duplicated_ids) ==0:
+		dupestring = "No duplicated family ids."
+	else:
+		dupestring = "ERROR: You have duplicate ids, only one family associated with each will appear in the database\n"
+		dupestring = dupestring + str(duplicated_ids)
+
 	curs.executemany(famentry, fams)
 	conn.commit()
 	conn.close()
+	return dupestring
 
 def update_spousenames():
 	conn = create_connection(dbname)

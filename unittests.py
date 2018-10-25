@@ -42,5 +42,9 @@ class Test(unittest.TestCase):
     def test_hundredfifty_years_old(self):
         self.assertEqual("ERROR: INDIVIDUAL: US07: I2: had an age greater than 150 years old\n", hundredfifty_years_old())
 
+    # def test_duplicate_id_checker(self):
+    #     passer = "ERROR: You have duplicates ids or (name,date) pairs, only one individual associated with each will appear in the database\n['I2']\n[]"
+    #     self.assertEqual(passer, )
+
 if __name__ == "__main__":
     unittest.main()
