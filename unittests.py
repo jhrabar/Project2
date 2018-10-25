@@ -32,5 +32,15 @@ class Test(unittest.TestCase):
         self.assertEqual(1, dateCompare("15 NOV 2018", "15 NOV 2018"))
         self.assertEqual(0, dateCompare("15 NOV 2018", "14 NOV 2018"))
 
+    def test_date_difference(self):
+        self.assertEqual(20, dateDifference("15 NOV 1998", "15 NOV 2018"))
+        self.assertEqual(19, dateDifference("16 NOV 1998", "15 NOV 2018"))
+
+    def test_parents_too_old(self):
+        self.assertEqual("ERROR: FAMILY: US12: F1: Father I2 is greater than 80 years older than child I1\nERROR: FAMILY: US12: F1: Mother I3 is greater than 60 years older than child I1\nERROR: FAMILY: US12: F1: Father I2 is greater than 80 years older than child I4\nERROR: FAMILY: US12: F1: Mother I3 is greater than 60 years older than child I4\n", parents_too_old())
+
+    def test_hundredfifty_years_old(self):
+        self.assertEqual("ERROR: INDIVIDUAL: US07: I2: had an age greater than 150 years old\n", hundredfifty_years_old())
+
 if __name__ == "__main__":
     unittest.main()

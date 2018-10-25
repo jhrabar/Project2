@@ -287,6 +287,58 @@ def future_date_check():
 		string = "US01: No dates occur in future\n"
 	return string
 
+def dateDifference(date1, date2):
+	date1List = date1.split()
+	date2List = date2.split()
+	if months[date1List[1]] > months[date2List[1]] or (months[date1List[1]] == months[date2List[1]] and int(date1List[0]) > int(date2List[0])):
+		return int(date2List[2]) - int(date1List[2]) - 1
+	else:
+		return int(date2List[2]) - int(date1List[2])
+
+def hundredfifty_years_old():
+	#checks whether someone is younger than 150
+	now = datetime.datetime.now()
+	currDate = str(now.day) + " " + list(months.keys())[now.month - 1] + " " + str(now.year)
+	conn = create_connection(dbname)
+	curs = conn.cursor()
+	curs.execute('''SELECT ID, birthday, death FROM individual''')
+	individualResult = curs.fetchall()
+	conn.close()
+	resultString=""
+	for tup in individualResult:
+		if tup[2] == "NA":
+			if dateDifference(tup[1], currDate) >= 150:
+				resultString += "ERROR: INDIVIDUAL: US07: {ID}: has an age greater than 150 years old\n".format(ID = tup[0])
+		else:
+			if dateDifference(tup[1], tup[2]) >= 150:
+				resultString += "ERROR: INDIVIDUAL: US07: {ID}: had an age greater than 150 years old\n".format(ID = tup[0])
+	if len(resultString) == 0:
+		resultString = "US07: No people older than 150 years old\n"
+	return resultString		
+
+def parents_too_old():
+	conn = create_connection(dbname)
+	curs = conn.cursor()
+	curs.execute('''SELECT ID, hID, wID FROM family''')
+	familyResult = curs.fetchall()
+	resultString=""
+	for tup in familyResult:
+		curs.execute('''SELECT birthday FROM individual WHERE ID = ? ''', (tup[1],))
+		hBirthday = curs.fetchone()
+		curs.execute('''SELECT birthday FROM individual WHERE ID = ? ''', (tup[2],))
+		wBirthday = curs.fetchone()
+		family = "['" + tup[0] + "']"
+		curs.execute('''SELECT ID, birthday FROM individual WHERE child = ? ''', (family,))
+		individualResult = curs.fetchall()
+		for tup2 in individualResult:
+			if dateDifference(hBirthday[0], tup2[1]) >= 80:
+				resultString += "ERROR: FAMILY: US12: {ID}: Father {hID} is greater than 80 years older than child {cID}\n".format(ID = tup[0], hID = tup[1], cID = tup2[0])
+			if dateDifference(wBirthday[0], tup2[1]) >= 60:
+				resultString += "ERROR: FAMILY: US12: {ID}: Mother {hID} is greater than 60 years older than child {cID}\n".format(ID = tup[0], hID = tup[2], cID = tup2[0])
+	conn.close()
+	if len(resultString) == 0:
+		resultString = "US12: No parents are too old\n"
+	return resultString		
 
 def gender_roles():
 	conn = create_connection(dbname)
