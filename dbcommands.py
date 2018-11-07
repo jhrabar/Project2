@@ -428,6 +428,22 @@ def uniform_male_surnames():#incomplete
 		result_string = 'Some families have inconsistent male surnames:\n'+str(bad_families)	
 	return result_string
 	
+def list_living_married():
+	conn = create_connection(dbname)
+	curs = conn.cursor()
+	curs.execute('''SELECT ID, hID, wID FROM family WHERE divorced = \'NA\'''')
+	familyResult = curs.fetchall()
+	resultString = ""
+	for family in familyResult:
+		curs.execute('''SELECT ID, name FROM individual WHERE (ID = ? OR ID = ?) AND alive = 1''', (family[1], family[2],) )
+		result = curs.fetchall()
+		resultString += str(result)
+	conn.close()
+	return resultString
 
-
-	
+def list_living_single():
+	conn = create_connection(dbname)
+	curs = conn.cursor()
+	curs.execute('''SELECT ID, name FROM individual WHERE alive = 1 AND age >= 30 AND spouse = \'NA\'''')
+	individualResult = curs.fetchall()
+	return str(individualResult)
