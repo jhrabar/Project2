@@ -374,3 +374,29 @@ def fifteen_siblings():
 	if len(resultString) == 0:
 		resultString = "US15: All Families Have Fewer than 15 Children\n"
 	return resultString
+
+def unique_spouses():
+	conn = create_connection(dbname)
+	curs = conn.cursor()
+	curs.execute('''SELECT ID, hID, wID FROM family''')
+	fam_spouses = curs.fetchall()
+	conn.close()
+	#we already know fam IDs are unique
+	families_to_eliminate = []
+	for i in range(len(fam_spouses)):
+		husband = fam_spouses[i][1]
+		wife = fam_spouses[i][2]
+		for j in range(i+1, len(fam_spouses)):
+			if fam_spouses[j][1] == husband and fam_spouses[j][2] == wife:
+				families_to_eliminate.append((fam_spouses[j][0]))
+	resultstring = 'No duplicated families.'
+	if len(families_to_eliminate)>0:
+		resultstring = 'The following families are duplicates:\n' + str(families_to_eliminate)
+	return resultstring
+
+def uniform_male_surnames():#incomplete
+	conn = create_connection(dbname)
+	curs = conn.cursor()
+	curs.execute('''SELECT ID, hID, children''')
+	families = curs.fetchall()
+	

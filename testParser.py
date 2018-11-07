@@ -215,12 +215,13 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
-    
-    print("\nList Of Deceased:")
-    print(list_deceased())
-    print("\n")
-    print(child_marriage_check())
-    print(future_date_check())
-    print(marriage_before_death())
-    print(divorce_before_death())
+	main()
+
+	print("\nList Of Deceased:")
+	print(list_deceased())
+	print("\n")
+	print(child_marriage_check())
+	print(future_date_check())
+	print(marriage_before_death())
+	print(divorce_before_death())
+	print(unique_spouses())
