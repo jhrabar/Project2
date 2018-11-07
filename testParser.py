@@ -225,3 +225,4 @@ if __name__ == '__main__':
 	print(marriage_before_death())
 	print(divorce_before_death())
 	print(unique_spouses())
+	print(uniform_male_surnames())

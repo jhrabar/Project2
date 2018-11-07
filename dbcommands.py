@@ -3,6 +3,7 @@ from sqlite3 import Error
 import datetime
 import re
 from collections import Counter
+from ast import literal_eval
 
 dbname = 'gedcom.db'
 
@@ -351,7 +352,7 @@ def gender_roles():
 		for tup2 in familyResult:
 			if tup[0] == tup2[1]:
 				if tup[1] != "M":
-					resultString += "ERROR: FAMILY: US21: {fID}: Husband {hID} has incorrect gender\n".format(fID = tup2[0], hID = tup[0])
+					resultString += "ERROR: FAMILY: US21: {fID}: Husband {hID} has incorrect gender\n".format(fID = tup2[0], hID = tup[0])#needs to update husband gender
 			elif tup[0] == tup2[2]:
 				if tup[1] != "F":
 					resultString += "ERROR: FAMILY: US21: {fID}: Wife {wID} has incorrect gender\n".format(fID = tup2[0], wID = tup[0])
@@ -394,9 +395,39 @@ def unique_spouses():
 		resultstring = 'The following families are duplicates:\n' + str(families_to_eliminate)
 	return resultstring
 
+
+
 def uniform_male_surnames():#incomplete
 	conn = create_connection(dbname)
 	curs = conn.cursor()
-	curs.execute('''SELECT ID, hID, children''')
-	families = curs.fetchall()
+	curs.execute('''SELECT ID, hID, children FROM family''')
+	fams = curs.fetchall()
+	families = [[fam[0],fam[1],literal_eval(fam[2])] for fam in fams]
+	curs.execute('''SELECT ID, name FROM individual WHERE gender = \'M\'''')
+	men = curs.fetchall()
+	conn.close()
+	mendict = dict()
+	bad_families = []
+	for man in men:
+		mendict[man[0]]=man[1]
+	for man in list(mendict.keys()):
+		mendict[man] = mendict[man].split('/')[1].strip()
+	for family in families:
+		if family[1] in list(mendict.keys()):
+			family_name = mendict[family[1]]
+		else:
+			continue
+		for child in family[2]:
+			if child in list(mendict.keys()):
+				if mendict[child]!=family_name:
+					bad_families.append(family[0])
+			else:
+				continue
+	result_string = 'No families with inconsistent male surnames.'
+	if len(bad_families) >0 :
+		result_string = 'Some families have inconsistent male surnames:\n'+str(bad_families)	
+	return result_string
+	
+
+
 	
