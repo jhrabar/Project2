@@ -315,6 +315,42 @@ def hundredfifty_years_old():
 		resultString = "US07: No people older than 150 years old\n"
 	return resultString		
 
+def sibling_marriage():
+	#checks whether or not siblings are married
+	conn = create_connection(dbname)
+	curs = conn.cursor()
+	curs.execute('''SELECT ID, hID, wID FROM family''')
+	familyResult = curs.fetchall()
+	resultString=""
+	for tup in familyResult:
+		curs.execute('''SELECT ID, child FROM individual WHERE ID = ? OR ID = ?''', (tup[1],tup[2],))
+		individuals = curs.fetchall()
+		if individuals[0][1] == individuals[1][1] and individuals[0][1] != "NA":
+			resultString += "ERROR: FAMILY: US18: {ID}: husband and wife are siblings\n".format(ID = tup[0])
+	if len(resultString) == 0:
+		resultString = "US18: No siblings married here! \n"
+	return resultString
+
+def orphan_checker():
+	#checks for orphans
+	conn = create_connection(dbname)
+	curs = conn.cursor()
+	curs.execute('''SELECT ID, name, age, child FROM individual''')
+	individualResult = curs.fetchall()
+	resultString="List of Orphans: \n["
+	for tup in individualResult:
+		if(tup[2] < 18):
+			fID = ''.join(c for c in tup[3] if c not in "\"'[] ")
+			curs.execute('''SELECT ID, hID, wID FROM family WHERE ID = ?''', (fID,))
+			family = curs.fetchone()
+			curs.execute('''SELECT ID, alive FROM individual WHERE ID = ? OR ID = ?''', (family[1], family[2],))
+			parents = curs.fetchall()
+			if(parents[0][1] == 0 and parents[1][1] == 0):
+				resultString += str(tup[0:2])
+	resultString += "]"
+	return resultString
+
+
 def parents_too_old():
 	conn = create_connection(dbname)
 	curs = conn.cursor()

@@ -227,6 +227,7 @@ if __name__ == '__main__':
 	print(gender_roles())
 	print(fifteen_siblings())
 	print(hundredfifty_years_old())
+	print(sibling_marriage())
 	print(parents_too_old())
 	print(unique_spouses())
 	print(uniform_male_surnames())
@@ -234,3 +235,4 @@ if __name__ == '__main__':
 	print(list_living_married())
 	print("\nList of Living Singles:")
 	print(list_living_single())
+	print(orphan_checker())
