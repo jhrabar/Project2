@@ -51,6 +51,15 @@ class Test(unittest.TestCase):
     def test_list_orphans(self):
         self.assertEqual(orphan_checker(), "US33: List of Orphans: \n[('I25', 'Steve /Swerve/')]")
 
+    def test_unique_spouses(self):
+        #This unittest will always have this answer because unique_spouses always cleans up when it runs in main,
+        #So when it is run again in unittests, it will always say this. Comment out the call to unique_spouses in testParser
+        #and comment out the pass case here while uncommenting the second testcase here to see the other functionality in action.
+        self.assertEqual(unique_spouses(),"No duplicated families.")
+        #self.assertEqual(unique_spouses(),"The following families have duplicate husband-wife pairs and have been eliminated from the database:\n[\'F20\']")
+
+        
+
     def test_sibling_marriage(self):
         self.assertEqual(sibling_marriage(), "ERROR: FAMILY: US18: F21: husband and wife are siblings\n")
 

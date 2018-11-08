@@ -417,7 +417,6 @@ def unique_spouses():
 	curs = conn.cursor()
 	curs.execute('''SELECT ID, hID, wID FROM family''')
 	fam_spouses = curs.fetchall()
-	conn.close()
 	#we already know fam IDs are unique
 	families_to_eliminate = []
 	for i in range(len(fam_spouses)):
@@ -427,8 +426,12 @@ def unique_spouses():
 			if fam_spouses[j][1] == husband and fam_spouses[j][2] == wife:
 				families_to_eliminate.append((fam_spouses[j][0]))
 	resultstring = 'No duplicated families.'
+	eliminate_list = [(fam,) for fam in families_to_eliminate]
+	curs.executemany('''DELETE FROM family WHERE ID = ?''', eliminate_list)
+	conn.commit()
+	conn.close()
 	if len(families_to_eliminate)>0:
-		resultstring = 'The following families are duplicates:\n' + str(families_to_eliminate)
+		resultstring = 'The following families have duplicate husband-wife pairs and have been eliminated from the database:\n' + str(families_to_eliminate)
 	return resultstring
 
 
