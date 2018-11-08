@@ -212,12 +212,17 @@ def main():
 	addfams(Families)
 	addindis(Individuals)
 	update_spousenames()
+	print("Table of Individuals:")
+	print(individs)
+	print("\nTable of Families:")
+	print(famils)
 
 
 if __name__ == '__main__':
 	main()
 
-	print("\nList Of Deceased:")
+	print(unique_spouses())
+	print("\nUS29: List Of Deceased:")
 	print(list_deceased())
 	print("\n")
 	print(child_marriage_check())
@@ -229,10 +234,9 @@ if __name__ == '__main__':
 	print(hundredfifty_years_old())
 	print(sibling_marriage())
 	print(parents_too_old())
-	print(unique_spouses())
 	print(uniform_male_surnames())
-	print("\nList of Married Living:")
+	print("\nUS30: List of Married Living:")
 	print(list_living_married())
-	print("\nList of Living Singles:")
+	print("\nUS31: List of Living Singles:")
 	print(list_living_single())
 	print(orphan_checker())

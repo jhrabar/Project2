@@ -337,7 +337,7 @@ def orphan_checker():
 	curs = conn.cursor()
 	curs.execute('''SELECT ID, name, age, child FROM individual''')
 	individualResult = curs.fetchall()
-	resultString="List of Orphans: \n["
+	resultString="US33: List of Orphans: \n["
 	for tup in individualResult:
 		if(tup[2] < 18):
 			fID = ''.join(c for c in tup[3] if c not in "\"'[] ")
@@ -459,9 +459,9 @@ def uniform_male_surnames():#incomplete
 					bad_families.append(family[0])
 			else:
 				continue
-	result_string = 'No families with inconsistent male surnames.'
+	result_string = 'US16: No families with inconsistent male surnames.'
 	if len(bad_families) >0 :
-		result_string = 'Some families have inconsistent male surnames:\n'+str(bad_families)	
+		result_string = 'ERROR: US16: Some families have inconsistent male surnames:\n'+str(bad_families)	
 	return result_string
 	
 def list_living_married():
@@ -473,7 +473,8 @@ def list_living_married():
 	for family in familyResult:
 		curs.execute('''SELECT ID, name FROM individual WHERE (ID = ? OR ID = ?) AND alive = 1''', (family[1], family[2],) )
 		result = curs.fetchall()
-		resultString += str(result)
+		if len(result) > 0:
+			resultString += str(result)
 	conn.close()
 	return resultString
 
