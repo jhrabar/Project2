@@ -46,7 +46,7 @@ class Test(unittest.TestCase):
         self.assertEqual("[('I9', 'James /Stan/')]", list_living_single())
 
     def test_list_living_married(self):
-        self.assertEqual(list_living_married(), "[('I3', 'Stephanie /Alton/')][('I3', 'Stephanie /Alton/')][('I21', 'Me /STeve/'), ('I22', 'Mel /STeve/')]")
+        self.assertEqual(list_living_married(), "[('I3', 'Stephanie /Alton/')][('I21', 'Me /STeve/'), ('I22', 'Mel /STeve/')][('I150', 'Henry /Jones/'), ('I151', 'Lily /Brain/')][('I200', 'Jerry /Small/'), ('I201', 'Henriette /Jones/')][('I220', 'Vincent /Jones/'), ('I222', 'Kristen /Money/')][('I204', 'Gabby /Small/'), ('I225', 'Gilbert /Jones/')]")
 
     def test_list_orphans(self):
         self.assertEqual(orphan_checker(), "US33: List of Orphans: \n[('I25', 'Steve /Swerve/')]")
@@ -65,6 +65,12 @@ class Test(unittest.TestCase):
 
     def test_uniform_male_surnames(self):
         self.assertEqual(uniform_male_surnames(), "ERROR: US16: Some families have inconsistent male surnames:\n['F3']")
+
+    def test_birth_before_marriage(self):
+        self.assertEqual(birth_before_marriage(), "ERROR: INDIVIDUAL: US02: I24: Marriage 8 NOV 1980 occurs before birth 7 JUN 1981\n")
+
+    def test_first_cousin_marriage(self):
+        self.assertEqual(first_cousin_marriage(), "ERROR: US19: Individual I204 is married to their first cousin I225\nERROR: US19: Individual I225 is married to their first cousin I204\n")
 
     # def test_duplicate_id_checker(self):
     #     passer = "ERROR: You have duplicates ids or (name,date) pairs, only one individual associated with each will appear in the database\n['I2']\n[]"

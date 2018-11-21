@@ -486,4 +486,71 @@ def list_living_single():
 	curs = conn.cursor()
 	curs.execute('''SELECT ID, name FROM individual WHERE alive = 1 AND age >= 30 AND spouse = \'NA\'''')
 	individualResult = curs.fetchall()
+	conn.close()
 	return str(individualResult)
+
+def birth_before_marriage():
+	conn = create_connection(dbname)
+	curs = conn.cursor()
+	curs.execute('''SELECT married, hID, wID FROM family''')
+	familyResult = curs.fetchall()
+	resultString = ""
+	for fam in familyResult:
+		curs.execute('''SELECT ID, name, birthday FROM individual WHERE (ID = ? OR ID = ?)''', (fam[1], fam[2],))
+		result = curs.fetchall()
+		for indi in result:
+			if dateCompare(indi[2], fam[0]) == 0:
+				resultString += "ERROR: INDIVIDUAL: US02: {ID}: Marriage {marriage} occurs before birth {birth}\n".format(ID = indi[0], marriage = fam[0], birth = indi[2])
+	if len(resultString) == 0:
+		resultString += "USO2: No individuals married before birth\n"
+	conn.close()
+	return resultString
+
+def first_cousin_marriage():
+	conn = create_connection(dbname)
+	curs = conn.cursor()
+	#get individuals who have parents in the db and have been married
+	curs.execute('''SELECT ID, child, spouse FROM individual WHERE NOT spouse = \'NA\' AND NOT child = \'NA\'''')
+	individualResult = curs.fetchall()
+	resultString = ""
+	for individual in individualResult:
+		spouseIDs = []
+		fID = ''.join(c for c in individual[2] if c not in "\"'[] ")
+		fList = fID.split(",")
+		for f in fList:
+			curs.execute('''SELECT hID, wID FROM family WHERE hID = ? OR wID = ?''', (individual[0], individual[0], ))
+			families = curs.fetchall()
+			for fam in families:
+				if fam[0] == individual[0]:
+					spouseIDs.append(fam[1])
+				elif fam[1] == individual[0]:
+					spouseIDs.append(fam[0])
+		fID = ''.join(c for c in individual[1] if c not in "\"'[] ")
+		#get the family of the individual's parents
+		curs.execute('''SELECT ID, hID, wID FROM family WHERE ID = ?''', (fID,))
+		parentFamily = curs.fetchone()
+		#get the individual parents
+		curs.execute('''SELECT ID, child FROM individual WHERE ID = ? OR ID = ?''', (parentFamily[1], parentFamily[2], ))
+		parents = curs.fetchall()
+		for parent in parents:
+			if parent[1] != "NA":
+				#get the family the parent is a child of
+				fID = ''.join(c for c in parent[1] if c not in "\"'[] ")
+				curs.execute('''SELECT ID, children FROM family WHERE ID = ?''', (fID, ))
+				grandParentFamily = curs.fetchone()
+				AuntAndUncleIDs = ''.join(c for c in grandParentFamily[1] if c not in "\"'[] ")
+				listOfAuntsAndUncles = AuntAndUncleIDs.split(',')
+				for AuntOrUncle in listOfAuntsAndUncles:
+					if AuntOrUncle != parent[0]:
+						curs.execute('''SELECT children FROM family WHERE hID = ? or wID = ?''', (AuntOrUncle, AuntOrUncle, ))
+						cousinFamilies = curs.fetchall()
+						for cousinFamily in cousinFamilies:
+							cousinIDs = ''.join(c for c in cousinFamily[0] if c not in "\"'[] ")
+							listOfCousins = cousinIDs.split(',')
+							for spouse in spouseIDs:
+								if spouse in listOfCousins:
+									resultString += "ERROR: US19: Individual {ID} is married to their first cousin {ID2}\n".format(ID = individual[0], ID2 = spouse)
+	if len(resultString) == 0:
+		resultString += "US19: No first cousin marriages\n"
+	conn.close()
+	return resultString

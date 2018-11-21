@@ -221,6 +221,7 @@ def main():
 if __name__ == '__main__':
 	main()
 
+	print("\n")
 	print(unique_spouses())
 	print("\nUS29: List Of Deceased:")
 	print(list_deceased())
@@ -240,3 +241,5 @@ if __name__ == '__main__':
 	print("\nUS31: List of Living Singles:")
 	print(list_living_single())
 	print(orphan_checker())
+	print(birth_before_marriage())
+	print(first_cousin_marriage())
