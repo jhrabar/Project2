@@ -243,3 +243,6 @@ if __name__ == '__main__':
 	print(orphan_checker())
 	print(birth_before_marriage())
 	print(first_cousin_marriage())
+	print(list_children_age_order())
+	print(marriage_before_divorce())
+

@@ -434,7 +434,7 @@ def unique_spouses():
 		resultstring = 'The following families have duplicate husband-wife pairs and have been eliminated from the database:\n' + str(families_to_eliminate)
 	return resultstring
 
-def uniform_male_surnames():#incomplete
+def uniform_male_surnames():
 	conn = create_connection(dbname)
 	curs = conn.cursor()
 	curs.execute('''SELECT ID, hID, children FROM family''')
@@ -572,3 +572,30 @@ def marriage_before_divorce():
 	conn.close()
 	return resultString
 
+def list_children(family):
+	children = literal_eval(family[1])
+	kids = [(kid,) for kid in children]
+	# print(kids)
+	conn = create_connection(dbname)
+	curs = conn.cursor()
+	progeny = []
+	for kid in kids:
+		curs.execute('''SELECT ID, age, name FROM individual WHERE ID = ?''', kid)
+		progeny += curs.fetchall()
+	progeny.sort(key = lambda kid: kid[1])
+	child_list = str(family[0]) + "\n"
+	child_list += str([(child[0], child[2], child[1]) for child in progeny]) + "\n"
+	conn.close()
+	return child_list
+
+
+def list_children_age_order():
+	conn = create_connection(dbname)
+	curs = conn.cursor()
+	curs.execute('''SELECT ID, children FROM family''')
+	fams = curs.fetchall()
+	conn.close()
+	result = ''
+	for fam in fams:
+		result += list_children(fam)
+	return result
