@@ -232,6 +232,8 @@ if __name__ == '__main__':
 	print(divorce_before_death())
 	print(gender_roles())
 	print(fifteen_siblings())
+	print(no_bigamy())
+	print(death_before_birth())
 	print(hundredfifty_years_old())
 	print(sibling_marriage())
 	print(parents_too_old())

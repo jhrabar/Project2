@@ -315,6 +315,50 @@ def hundredfifty_years_old():
 		resultString = "US07: No people older than 150 years old\n"
 	return resultString		
 
+def death_before_birth():
+	#checks whether a person has died before they were born
+	conn = create_connection(dbname)
+	curs = conn.cursor()
+	curs.execute('''SELECT ID, birthday, death FROM individual''')
+	result = curs.fetchall()
+	conn.close()
+	string =""
+	for tup in result:
+		if tup[2] != "NA":
+			if dateCompare(tup[1], tup[2]) == 0:
+				string += "ERROR: INDIVIDUAL: US03: {ID}: Death {Death} occurs before birthday\n".format(ID = tup[0], Death = tup[2])
+	if len(string) == 0:
+		string = "US03: No deaths occur before birth\n"
+	return string					
+
+def no_bigamy():
+	#checks whether or not a person is married to 2 or more people
+	conn = create_connection(dbname)
+	curs = conn.cursor()
+	curs.execute('''SELECT ID AS indiID FROM individual WHERE (SELECT COUNT(ID) FROM family WHERE hID = indiID OR wID = indiID) > 1''')
+	result = curs.fetchall()
+	string=""
+	for tup in result:
+		curs.execute('''SELECT ID, married, divorced FROM family WHERE hID = ? OR wID = ?''', (tup[0], tup[0], ))
+		multipartners = curs.fetchall()
+		for i in range(len(multipartners) - 1):
+				if dateCompare(multipartners[i][1], multipartners[i+1][1]) == 1:
+					if(multipartners[i][2] != 'NA'):
+							if dateCompare(multipartners[i][2], multipartners[i+1][1]) == 1:
+								string += "ERROR: INDIVIDUAL: US12: {ID}: is married to more than one person currently\n".format(ID = tup[0])
+					else:
+						string += "ERROR: INDIVIDUAL: US12: {ID}: is married to more than one person currently\n".format(ID = tup[0])				
+				else:
+					if(multipartners[i+1][2] != 'NA'):
+							if dateCompare(multipartners[i+1][2], multipartners[i][1]) == 1:
+								string += "ERROR: INDIVIDUAL: US12: {ID}: is married to more than one person currently\n".format(ID = tup[0])	
+					else:
+						string += "ERROR: INDIVIDUAL: US12: {ID}: is married to more than one person currently\n".format(ID = tup[0])
+	conn.close()
+	if len(string) == 0:
+		string = "US12: No individuals with more than one marriage partner\n"
+	return string
+
 def sibling_marriage():
 	#checks whether or not siblings are married
 	conn = create_connection(dbname)
