@@ -343,19 +343,19 @@ def no_bigamy():
 		for i in range(len(multipartners) - 1):
 				if dateCompare(multipartners[i][1], multipartners[i+1][1]) == 1:
 					if(multipartners[i][2] != 'NA'):
-							if dateCompare(multipartners[i][2], multipartners[i+1][1]) == 1:
-								string += "ERROR: INDIVIDUAL: US12: {ID}: is married to more than one person currently\n".format(ID = tup[0])
+						if dateCompare(multipartners[i][2], multipartners[i+1][1]) == 0:
+							string += "ERROR: INDIVIDUAL: US11: {ID}: is married to more than one person currently\n".format(ID = tup[0])
 					else:
-						string += "ERROR: INDIVIDUAL: US12: {ID}: is married to more than one person currently\n".format(ID = tup[0])				
+						string += "ERROR: INDIVIDUAL: US11: {ID}: is married to more than one person currently\n".format(ID = tup[0])				
 				else:
 					if(multipartners[i+1][2] != 'NA'):
-							if dateCompare(multipartners[i+1][2], multipartners[i][1]) == 1:
-								string += "ERROR: INDIVIDUAL: US12: {ID}: is married to more than one person currently\n".format(ID = tup[0])	
+						if dateCompare(multipartners[i+1][2], multipartners[i][1]) == 0:
+							string += "ERROR: INDIVIDUAL: US11: {ID}: is married to more than one person currently\n".format(ID = tup[0])	
 					else:
-						string += "ERROR: INDIVIDUAL: US12: {ID}: is married to more than one person currently\n".format(ID = tup[0])
+						string += "ERROR: INDIVIDUAL: US11: {ID}: is married to more than one person currently\n".format(ID = tup[0])
 	conn.close()
 	if len(string) == 0:
-		string = "US12: No individuals with more than one marriage partner\n"
+		string = "US11: No individuals with more than one marriage partner\n"
 	return string
 	
 def sibling_marriage():

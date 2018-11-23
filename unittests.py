@@ -46,7 +46,7 @@ class Test(unittest.TestCase):
         self.assertEqual("[('I9', 'James /Stan/')]", list_living_single())
 
     def test_list_living_married(self):
-        self.assertEqual(list_living_married(), "[('I3', 'Stephanie /Alton/')][('I21', 'Me /STeve/'), ('I22', 'Mel /STeve/')][('I150', 'Henry /Jones/'), ('I151', 'Lily /Brain/')][('I200', 'Jerry /Small/'), ('I201', 'Henriette /Jones/')][('I220', 'Vincent /Jones/'), ('I222', 'Kristen /Money/')][('I204', 'Gabby /Small/'), ('I225', 'Gilbert /Jones/')]")
+        self.assertEqual(list_living_married(), "[('I3', 'Stephanie /Alton/')][('I21', 'Me /STeve/'), ('I22', 'Mel /STeve/')][('I150', 'Henry /Jones/'), ('I151', 'Lily /Brain/')][('I200', 'Jerry /Small/'), ('I201', 'Henriette /Jones/')][('I220', 'Vincent /Jones/'), ('I222', 'Kristen /Money/')][('I204', 'Gabby /Small/'), ('I225', 'Gilbert /Jones/')][('I300', 'Bill /Biff/'), ('I302', 'Jane /Guy/')]")
 
     def test_list_orphans(self):
         self.assertEqual(orphan_checker(), "US33: List of Orphans: \n[('I25', 'Steve /Swerve/')]")
@@ -76,7 +76,14 @@ class Test(unittest.TestCase):
         self.assertEqual(marriage_before_divorce(), "ERROR: US04: The following families have divorces before marriages:\nF30,")
 
     def test_list_children_in_age_order(self):
-        self.assertEqual(list_children_age_order(), "F1\n[('I4', 'Boy /Stevens/', -3309), ('I1', 'Steven /Stevens/', -318), ('I2', 'Mario /Stevens/', 222)]\nF2\n[('I2', 'Mario /Stevens/', 222)]\nF3\n[('I5', 'Bella /Stan/', 58), ('I9', 'James /Stan/', 59), ('I22', 'Mel /STeve/', 69), ('I21', 'Me /STeve/', 73)]\nF21\n[]\nF30\n[('I25', 'Steve /Swerve/', 17)]\nF34\n[('I201', 'Henriette /Jones/', 48), ('I220', 'Vincent /Jones/', 55)]\nF35\n[('I203', 'Jess /Small/', 17), ('I202', 'Helen /Small/', 18), ('I204', 'Gabby /Small/', 19)]\nF36\n[('I226', 'Luigi /Jones/', 6), ('I225', 'Gilbert /Jones/', 18)]\nF37\n[]\n")
+        self.assertEqual(list_children_age_order(), "F1\n[('I4', 'Boy /Stevens/', -3309), ('I1', 'Steven /Stevens/', -318), ('I2', 'Mario /Stevens/', 222)]\nF2\n[('I2', 'Mario /Stevens/', 222)]\nF3\n[('I5', 'Bella /Stan/', 58), ('I9', 'James /Stan/', 59), ('I22', 'Mel /STeve/', 69), ('I21', 'Me /STeve/', 73)]\nF21\n[]\nF30\n[('I25', 'Steve /Swerve/', 17)]\nF34\n[('I201', 'Henriette /Jones/', 48), ('I220', 'Vincent /Jones/', 55)]\nF35\n[('I203', 'Jess /Small/', 17), ('I202', 'Helen /Small/', 18), ('I204', 'Gabby /Small/', 19)]\nF36\n[('I226', 'Luigi /Jones/', 6), ('I225', 'Gilbert /Jones/', 18)]\nF37\n[]\nF200\n[]\nF201\n[]\n")
+
+    def test_no_bigamy(self):
+        self.assertEqual(no_bigamy(), "ERROR: INDIVIDUAL: US11: I300: is married to more than one person currently\n")
+
+    def test_death_before_birth(self):
+        self.assertEqual(death_before_birth(), "US03: No deaths occur before birth\n")
+
 
     # def test_duplicate_id_checker(self):
     #     passer = "ERROR: You have duplicates ids or (name,date) pairs, only one individual associated with each will appear in the database\n['I2']\n[]"
