@@ -235,6 +235,8 @@ if __name__ == '__main__':
 	print(hundredfifty_years_old())
 	print(sibling_marriage())
 	print(parents_too_old())
+	print(death_before_birth())
+	print(no_bigamy())
 	print(uniform_male_surnames())
 	print("\nUS30: List of Married Living:")
 	print(list_living_married())
