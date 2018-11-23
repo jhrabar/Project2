@@ -434,8 +434,6 @@ def unique_spouses():
 		resultstring = 'The following families have duplicate husband-wife pairs and have been eliminated from the database:\n' + str(families_to_eliminate)
 	return resultstring
 
-
-
 def uniform_male_surnames():#incomplete
 	conn = create_connection(dbname)
 	curs = conn.cursor()
@@ -554,3 +552,23 @@ def first_cousin_marriage():
 		resultString += "US19: No first cousin marriages\n"
 	conn.close()
 	return resultString
+
+def marriage_before_divorce():
+	conn = create_connection(dbname)
+	curs = conn.cursor()
+	curs.execute('''SELECT married, divorced, ID FROM family''')
+	familyResult = curs.fetchall()
+	resultString = ''
+	for fam in familyResult:
+		if fam[1] == 'NA':
+			continue
+		else:
+			if dateDifference(fam[0],fam[1])<0:
+				resultString+=str(fam[2])+','
+	if len(resultString)>0:
+		resultString = 'The following families have divorces before marriages:\n' + resultString
+	else:
+		resultString = 'No families with divorce before marriage.'
+	conn.close()
+	return resultString
+
