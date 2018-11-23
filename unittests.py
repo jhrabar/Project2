@@ -72,6 +72,12 @@ class Test(unittest.TestCase):
     def test_first_cousin_marriage(self):
         self.assertEqual(first_cousin_marriage(), "ERROR: US19: Individual I204 is married to their first cousin I225\nERROR: US19: Individual I225 is married to their first cousin I204\n")
 
+    def test_marriage_before_divorce(self):
+        self.assertEqual(marriage_before_divorce(), "ERROR: US04: The following families have divorces before marriages:\nF30,")
+
+    def test_list_children_in_age_order(self):
+        self.assertEqual(list_children_age_order(), "F1\n[('I4', 'Boy /Stevens/', -3309), ('I1', 'Steven /Stevens/', -318), ('I2', 'Mario /Stevens/', 222)]\nF2\n[('I2', 'Mario /Stevens/', 222)]\nF3\n[('I5', 'Bella /Stan/', 58), ('I9', 'James /Stan/', 59), ('I22', 'Mel /STeve/', 69), ('I21', 'Me /STeve/', 73)]\nF21\n[]\nF30\n[('I25', 'Steve /Swerve/', 17)]\nF34\n[('I201', 'Henriette /Jones/', 48), ('I220', 'Vincent /Jones/', 55)]\nF35\n[('I203', 'Jess /Small/', 17), ('I202', 'Helen /Small/', 18), ('I204', 'Gabby /Small/', 19)]\nF36\n[('I226', 'Luigi /Jones/', 6), ('I225', 'Gilbert /Jones/', 18)]\nF37\n[]\n")
+
     # def test_duplicate_id_checker(self):
     #     passer = "ERROR: You have duplicates ids or (name,date) pairs, only one individual associated with each will appear in the database\n['I2']\n[]"
     #     self.assertEqual(passer, )
