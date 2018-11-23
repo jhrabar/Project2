@@ -566,9 +566,9 @@ def marriage_before_divorce():
 			if dateDifference(fam[0],fam[1])<0:
 				resultString+=str(fam[2])+','
 	if len(resultString)>0:
-		resultString = 'The following families have divorces before marriages:\n' + resultString
+		resultString = 'ERROR: US04: The following families have divorces before marriages:\n' + resultString
 	else:
-		resultString = 'No families with divorce before marriage.'
+		resultString = 'US04: No families with divorce before marriage.'
 	conn.close()
 	return resultString
 
